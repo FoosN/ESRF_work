@@ -12,9 +12,11 @@ import numpy as np
 #import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import glob
 
 
 maninput_files = []
+# this is for specifiy explicitely the path to the GXPARM.XDS or XPARM.XDS file
 for arg in sys.argv[1:]:
     try:
         if os.path.isfile(arg):
@@ -26,6 +28,43 @@ for arg in sys.argv[1:]:
     except:
         pass
 
+#this is to explore directory and autmaticaly find HKL file to use them as source
+for arg in sys.argv[1:]:
+    path= os.path.abspath(arg)
+files = glob.glob("*.HKL")
+if files :
+    MyFile = "HKL file"
+    for filename in files:
+        maninput_files.append(os.path.join(path, filename))
+crystList = []
+table = []
+table1 = []
+table2 = []
+if MyFile is "HKL file":
+    for i in maninput_files :
+        with open(i) as inputfile:
+            for line in inputfile:
+                if "UNIT_CELL_A-AXIS=" in line:
+                    axeA = line 
+                if "UNIT_CELL_B-AXIS=" in line:
+                    axeB = line
+                    #table.append(line[18:])
+                if "UNIT_CELL_C-AXIS=" in line:
+                    axeC = line                    
+                    table=axeA[18:], axeB[18:], axeC[18:]
+            table1.append(table)
+        for i in table1:
+            vecta = i[0].split()
+            vectb = i[1].split()
+            vectc = i[2].split()
+            vecta2 = np.array([float(vecta[0]), float(vecta[1]), float(vecta[2])])
+            vectb2 = np.array([float(vectb[0]), float(vectb[1]), float(vectb[2])])
+            vectc2 = np.array([float(vectc[0]), float(vectc[1]), float(vectc[2])])
+        vectRes = vecta2+vectb2+vectc2
+        crystList.append(vectRes)
+
+
+# this is for the weeded_files.txt file as original information
 path2 = []
 tpath = []
 tpath2 = []
@@ -57,12 +96,25 @@ for arg in sys.argv[1:]:
         pass
 #print maninput_files
 
+# this is to explore the directory to find GXPARM.XDS file anduse them automaticaly
 for arg in sys.argv[1:]:
     path= os.path.abspath(arg)
 for root, dirs, files in os.walk(path):
     for filename in files:
         if "GXPARM" and ".XDS" in filename:
             maninput_files.append(os.path.join(root, filename))
+            
+
+
+
+
+
+
+
+
+
+
+            
 
 #            
 
@@ -81,14 +133,14 @@ def fromGXPARMtoarray(maninput_files):
              table2.append(i.split())
          vecta =np.array([float(table2[0][0]), float(table2[0][1]), float(table2[0][2])])
          vectb =np.array([float(table2[1][0]), float(table2[1][1]), float(table2[1][2])])
-         vectc =np.array([float(table2[2][0]), float(table2[2][1]), float(table2[2][2])])
-         vectRes =vecta+vectb+vectc
+         vectc =np.array([float(table2[2][0]), float(table2[2][1]), float(table2[2][2])])       
+         vectRes = vecta+vectb+vectc
          crystList.append(vectRes)
          
                  
     return crystList
-
-crystList = fromGXPARMtoarray(maninput_files)
+if MyFile is not "HKL file": 
+    crystList = fromGXPARMtoarray(maninput_files)
 ##maxvalue = np.amax(crystList)
 #minvalue = np.amin(crystList)
 

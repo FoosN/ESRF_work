@@ -17,22 +17,36 @@ from cctbx import crystal
     
 output_path=argv[1]
 input_file=argv[2]
-
-def importer_converter(output_path, input_file):
+output_name= input_file.split("/")[-1]
+def importer_converter(output_path, input_file, outputname):
 
     f= any_file(input_file, force_type="hkl")
     miller_array= f.file_server.miller_arrays
-    
-    fobs= miller_array[1]
+    i=0
+    while i < 4:
+        fobs= miller_array[i]
+        if str(fobs.observation_type())== "xray.amplitude":
+            print "it's amplitude"
+            #convert amplitudes in intensities
+            iobs= fobs.f_as_f_sq()
+            break
+        elif str(fobs.observation_type()) == "xray.intensity":
+            print "it's already intensity"
+            iobs= fobs
+            break
+        #elif str(fobs.observation_type()) == "None":        
+        #    continue
+        i+=1
+            
+        
+     
+        
+         
     # following command return type of data (amplitudes, intensities...)
     #print fobs.observation_type()
     
     #fobs.show_summary()
     
-    #convert Amplitude to Intensity:
-    iobs= fobs.f_as_f_sq() 
-    #fobs2 = iobs.french_wilson()
-    #iobs2 = fobs2.f_as_f_sq()
     
     i_table= []
     for i in iobs:
@@ -87,9 +101,10 @@ def importer_converter(output_path, input_file):
     
     line2.append("!END_OF_DATA")
     
-    outputfile= open(str(output_path)+"/"+str(input_file)+".hkl", 'a')
+    outputfile= open(str(output_path)+"/"+str(output_name)+".hkl", 'a')
+
     
     for i in line2:
         outputfile.write(i+ "\n")
     #print path+"/"+str(input_file)+".hkl"
-importer_converter(output_path, input_file)
+importer_converter(output_path, input_file, output_name)

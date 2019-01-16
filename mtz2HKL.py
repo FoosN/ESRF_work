@@ -23,7 +23,7 @@ def importer_converter(output_path, input_file):
     f= any_file(input_file, force_type="hkl")
     miller_array= f.file_server.miller_arrays
     
-    fobs= miller_array[0]
+    fobs= miller_array[1]
     # following command return type of data (amplitudes, intensities...)
     #print fobs.observation_type()
     

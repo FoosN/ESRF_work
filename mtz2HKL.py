@@ -22,22 +22,45 @@ def importer_converter(output_path, input_file, outputname):
 
     f= any_file(input_file, force_type="hkl")
     miller_array= f.file_server.miller_arrays
-    i=0
-    while i < 4:
+    array_num= len(miller_array)
+
+#    i=0
+    i = array_num-1
+    while i >= 0:
         fobs= miller_array[i]
-        if str(fobs.observation_type())== "xray.amplitude":
-            print "it's amplitude"
-            #convert amplitudes in intensities
+        if str(fobs.info()).split(":")[1] == "F(+),SIGF(+),F(-),SIGF(-)":
+            print "it's amplitude with ANO"
+            fobs= fobs.as_anomalous_array()
             iobs= fobs.f_as_f_sq()
             break
-        elif str(fobs.observation_type()) == "xray.intensity":
+        elif str(fobs.info()).split(":")[1] == "FOBS,SIGFOBS":
+            print "it's amplitude"
+            iobs= fobs.f_as_f_sq()
+            break
+        elif str(fobs.info()).split(":")[1] == "I(+),SIGI(+),I(-),SIGI(-)":
+            print "it's already ANO intensity"
+            fobs= fobs.as_anomalous_array()
+            iobs= fobs
+            break  
+        elif str(fobs.info()).split(":")[1] == "IOBS,SIGIOBS":
             print "it's already intensity"
             iobs= fobs
             break
-        #elif str(fobs.observation_type()) == "None":        
-        #    continue
-        i+=1
-            
+        i-=1
+#    while i < array_num:
+#        fobs= miller_array[i]
+#        if str(fobs.observation_type())== "xray.amplitude":
+#            print "it's amplitude"
+#            #convert amplitudes in intensities
+#            iobs= fobs.f_as_f_sq()
+#            break
+#        elif str(fobs.observation_type()) == "xray.intensity":
+#            print "it's already intensity"
+#            iobs= fobs
+#            break
+#        #elif str(fobs.observation_type()) == "None":        
+#        #    continue
+#        i+=1
         
      
         
@@ -85,8 +108,8 @@ def importer_converter(output_path, input_file, outputname):
     cell1= cell1.replace(")",'')
     cell2= cell1.replace(",",'    ')
     
-    #line2.insert(0,"!UNIT_CELL_CONSTANTS=     "+cell2)
-    #line2.insert(0,"!SPACE_GROUP_NUMBER=    "+str(iobs.space_group_info()))
+    line2.insert(0,"!UNIT_CELL_CONSTANTS=     "+cell2)
+    line2.insert(0,"!SPACE_GROUP=    "+str(iobs.space_group_info()))
     
     res= str(iobs.d_max_min())
     res1= res.replace("(",'')

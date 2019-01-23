@@ -80,9 +80,9 @@ def importer_converter(output_path, input_file, outputname, ano):
     
     #fobs.show_summary()
     
-    
+    iobsSorted= sorted(iobs)    
     i_table= []
-    for i in iobs:
+    for i in iobsSorted:
          i2= list(i)
          i2[1]= '%.3E' % i2[1]
          i2[2]= '%.3E' % i2[2]

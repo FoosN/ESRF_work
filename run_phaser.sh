@@ -1,0 +1,10 @@
+phaser << eof
+TITLe Nico MR Fast
+MODE MR_AUTO
+HKLIn $1
+LABIn F=FP SIGF=SIGFP
+SGALTERNATIVE SELECT ALL
+ENSEmble prot PDB $2 IDENtity 100
+COMPosition BY AVERAGE 
+SEARch ENSEmble prot NUM 1
+eof
